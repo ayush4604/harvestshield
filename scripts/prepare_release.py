@@ -21,7 +21,7 @@ from backend.config import Settings
 from backend.data import Store
 
 DIRECTORIES = ("backend", "frontend", "tests", "scripts", "deployment", "docs", "LICENSES", ".streamlit", ".github")
-ROOT_FILES = ("README.md", "AGENTS.md", "requirements.txt", "requirements-lock.txt", "pytest.ini", "Dockerfile", "compose.yaml", ".dockerignore", ".gitignore", ".env.example", "Start-HarvestShield.ps1", "Stop-HarvestShield.ps1", "Setup-HarvestShield.ps1", "Start-HarvestShield.cmd", "Stop-HarvestShield.cmd", "Prepare-Real-Pilot.cmd")
+ROOT_FILES = ("README.md", "requirements.txt", "requirements-lock.txt", "pytest.ini", "Dockerfile", "compose.yaml", ".dockerignore", ".gitignore", ".env.example", "Start-HarvestShield.ps1", "Stop-HarvestShield.ps1", "Setup-HarvestShield.ps1", "Start-HarvestShield.cmd", "Stop-HarvestShield.cmd", "Prepare-Real-Pilot.cmd")
 
 
 def prepare_seed(root=ROOT, allow_empty=False):
@@ -84,6 +84,7 @@ def package(destination, root=ROOT):
             selected.extend(f for f in folder.rglob("*") if f.is_file()
                             and "__pycache__" not in f.parts
                             and f.suffix not in (".pyc", ".log")
+                            and (directory != "docs" or f.relative_to(folder).as_posix() in ("DEPLOYMENT.md", "THIRD_PARTY_DATA.md"))
                             and f.name not in ("secrets.toml", "RESUME_TOMORROW.md", "CONTEXT.md"))
     selected.extend(root / name for name in ROOT_FILES if (root / name).is_file())
     template = root / "data" / "templates" / "market_history.csv"

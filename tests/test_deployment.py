@@ -122,6 +122,10 @@ def test_seed_backup_bootstrap_and_archive_exclude_secrets(tmp_path):
     (root / "backend" / "api.py").write_text("# fixture")
     (root / ".streamlit").mkdir()
     (root / ".streamlit" / "secrets.toml").write_text("key='secret'")
+    (root / "AGENTS.md").write_text("private local instructions")
+    (root / "docs").mkdir()
+    (root / "docs" / "PLAN.md").write_text("private planning notes")
+    (root / "docs" / "DEPLOYMENT.md").write_text("public deployment instructions")
     seed = prepare_seed(root)
     manifest = json.loads((seed / "manifest.json").read_text())
     assert "data/harvestshield.sqlite" in manifest["files"]
@@ -134,6 +138,9 @@ def test_seed_backup_bootstrap_and_archive_exclude_secrets(tmp_path):
     with ZipFile(archive) as z:
         assert all(not n.endswith((".env", "secrets.toml")) for n in z.namelist())
         assert "HarvestShield/deployment/seed/manifest.json" in z.namelist()
+        assert "HarvestShield/docs/DEPLOYMENT.md" in z.namelist()
+        assert "HarvestShield/docs/PLAN.md" not in z.namelist()
+        assert "HarvestShield/AGENTS.md" not in z.namelist()
     with pytest.raises(ValueError, match="already exists"):
         prepare_seed(root)
 
