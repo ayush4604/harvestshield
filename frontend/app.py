@@ -103,7 +103,8 @@ else:
         if state == "missing_key":
             st.warning("Automatic prices: waiting for DATA_GOV_API_KEY in the deployment environment.")
         elif state == "error":
-            st.warning(feed_status["message"] + " Next retry (UTC): " + str(feed_status["next_attempt"]))
+            code = feed_status.get("error_code") or "UNCLASSIFIED"
+            st.warning(f"Automatic prices [{code}]: " + feed_status["message"] + " Next retry (UTC): " + str(feed_status["next_attempt"]))
         elif state in ("waiting", "fetching"):
             st.info("Automatic prices: first refresh is pending or in progress. Reload this page shortly.")
         elif state == "success":
@@ -116,6 +117,32 @@ else:
 audit = error_boundary(lambda: call("/api/audit", params={"mode": mode}))
 if audit is None:
     st.stop()
+all_series = audit["series"]
+configured_feed = feed_status.get("filters", {}) if mode == "real" and feed_status else {}
+state_options = sorted({s["state"] for s in all_series} | ({configured_feed["state"]} if configured_feed.get("state") else set()))
+
+
+def reset_browse_market():
+    st.session_state.pop(f"browse_market_{mode}", None)
+
+
+with st.sidebar:
+    st.divider()
+    st.caption("Browse stored market data")
+    selected_state = st.selectbox("State", state_options, index=None,
+        accept_new_options=True, placeholder="All states — select or type",
+        key=f"browse_state_{mode}", on_change=reset_browse_market,
+        help="Suggestions come from imported data and the configured feed. Type an official name if absent; this filters stored records, not the collection schedule.")
+    state_series = [s for s in all_series if not selected_state or s["state"].casefold() == selected_state.strip().casefold()]
+    selected_market = st.selectbox("Mandi / market", sorted({s["market"] for s in state_series}), index=None,
+        accept_new_options=True, placeholder="All mandis — select or type",
+        key=f"browse_market_{mode}", help="Choose a known mandi or type its exact reported name. Clear to show all. Changing state clears the mandi selection.")
+if selected_state or selected_market:
+    visible = [s for s in state_series if not selected_market or s["market"].casefold() == selected_market.strip().casefold()]
+    audit = {**audit, "series": visible, "rows": sum(s["rows"] for s in visible)}
+    if not visible:
+        st.info("No stored records match this state/mandi. Selecting a name does not change the server's automatic collection area or create a forecast. Clear the filters to see all available data.")
+visible_ids = {s["series_id"] for s in audit["series"]}
 if mode == "real" and audit["series"]:
     newest = max(s["last_date"] for s in audit["series"])
     if all(s["age_days"] > 3 for s in audit["series"]):
@@ -128,7 +155,11 @@ def forecast_data():
     params = {"mode": mode}
     if replay_date is not None:
         params["replay_date"] = str(replay_date)
-    return error_boundary(lambda: call("/api/forecasts", params=params))
+    result = error_boundary(lambda: call("/api/forecasts", params=params))
+    if result and (selected_state or selected_market):
+        result = {**result, "items": [s for s in result["items"] if s["series_id"] in visible_ids],
+            "withheld": [s for s in result["withheld"] if s["series_id"] in visible_ids]}
+    return result
 
 
 replay_date = None
@@ -196,6 +227,7 @@ if page == "Overview":
         selected = st.selectbox("Produce for historical chart", sorted(groups), format_func=lambda g: " · ".join(g))
         records = call("/api/history", params={"mode": mode, "limit": 10000})["records"]
         history = pd.DataFrame(records)
+        history = history[history.series_id.isin(visible_ids)]
         history = history[(history.commodity == selected[0]) & (history.variety == selected[1]) & (history.grade == selected[2])]
         history["date"] = pd.to_datetime(history.date)
         history = history[history.date >= history.date.max() - pd.Timedelta(days=180)]
@@ -310,19 +342,27 @@ elif page == "Data & models":
         with st.expander("Government daily-feed connector"):
             st.write("A daily snapshot does not replace historical training data. Configure DATA_GOV_API_KEY in the backend environment and restart it.")
             st.caption("Backend key configured: " + ("yes" if health["feed_key_configured"] else "no"))
-            with st.form("feed"):
-                state = st.text_input("State (official spelling)")
-                crop = st.text_input("Commodity (official spelling)")
-                market = st.text_input("Market filter (optional)")
-                feed_submit = st.form_submit_button("Fetch reported daily prices", disabled=not writes_enabled)
+            feed_states = sorted({s["state"] for s in all_series} | {configured_feed.get("state", "Maharashtra")})
+            def reset_feed_market():
+                st.session_state.pop("feed_market", None)
+            state = st.selectbox("Feed state (official spelling)", feed_states,
+                index=feed_states.index(configured_feed.get("state", "Maharashtra")),
+                accept_new_options=True, key="feed_state", on_change=reset_feed_market,
+                help="Select a suggested state or type its exact official name.")
+            crop = st.text_input("Commodity (official spelling)", value=configured_feed.get("commodity", "Tomato"))
+            markets = sorted({s["market"] for s in all_series if s["state"].casefold() == state.strip().casefold()})
+            market = st.selectbox("Feed mandi / market (optional)", markets, index=None,
+                accept_new_options=True, placeholder="All mandis — select or type", key="feed_market",
+                help="Suggestions come from imported observations for this state, not a complete national directory.")
+            st.caption("These fields apply to a manual administrator refresh only. Automatic collection uses the deployment's configured filters.")
+            feed_submit = st.button("Fetch reported daily prices", disabled=not writes_enabled)
             if feed_submit:
                 with st.spinner("Fetching reported prices from the government API…"):
-                    result = error_boundary(lambda: call("/api/feed/refresh", "POST", json={"state": state, "commodity": crop, "market": market}))
+                    result = error_boundary(lambda: call("/api/feed/refresh", "POST", json={"state": state, "commodity": crop, "market": market or ""}))
                 if result:
                     st.success(f"Fetched {result['received']:,} records; inserted {result['inserted']:,}.")
                     st.info(result["note"])
     st.subheader("Coverage audit")
-    audit = call("/api/audit", params={"mode": mode})
     if audit["series"]:
         st.dataframe(pd.DataFrame(audit["series"])[["market", "commodity", "variety", "grade", "first_date", "last_date", "rows", "calendar_gap_days", "coverage_fraction", "seven_day_label_count", "age_days"]], hide_index=True, width="stretch")
     else:

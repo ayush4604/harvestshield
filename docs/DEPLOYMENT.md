@@ -64,6 +64,28 @@ and retry after 15 minutes with exponential backoff up to the regular interval.
 The site remains available while the first fetch is running or the provider fails.
 Keys and provider exception URLs are not included in status or worker logs.
 
+Failure status includes an allowlisted `error_code` and optional numeric upstream
+HTTP status, not the raw provider body. Examples: `HTTP_401` (authentication
+rejected), `HTTP_403` (request denied; key or provider access restrictions),
+`HTTP_429` (rate limit), `TIMEOUT`, `TLS`, `INVALID_JSON`, `SCHEMA`,
+`NO_RECORDS`, `INVALID_RECORDS`, `DATA_CONFLICT`, and `STORAGE`.
+For a denial, verify the key privately in the official API tester before assuming
+the cloud configuration is wrong. Do not disable TLS verification, expose the
+key/response URL, or repeatedly redeploy to evade provider rate limits.
+The connector uses the API form's `filters[state.keyword]` parameter and still
+validates returned state/crop/market identities before ingestion. This connector
+revision invalidates the old schedule identity once so its first refresh runs
+after deployment rather than retaining an old retry deadline.
+
+The sidebar's State and Mandi/market controls are searchable dropdowns with custom
+typing enabled. Suggestions come from imported identities and the configured
+state, not a complete national mandi directory. Changing state clears the mandi
+selection. These controls filter stored observations/forecasts and do not let
+public visitors change the collection schedule. The administrator's manual feed
+controls also support select-or-type names and remain write-protected in public
+read-only deployments. An unknown name displays no matching stored records;
+it does not create data or a prediction.
+
 This endpoint supplies daily reports, not historical backfill. Automatic collection
 does not train a model on a handful of new observations: sufficient exact-series
 history and honest time-based evaluation are still required. Existing trained

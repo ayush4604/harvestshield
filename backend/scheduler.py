@@ -4,10 +4,11 @@ from datetime import datetime, timezone
 import json
 import logging
 import os
+import sqlite3
 import threading
 import time
 
-from .feed import refresh_feed
+from .feed import ERROR_MESSAGES, FeedError, refresh_feed
 
 log = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ class FeedCollector:
 
     def _identity(self):
         s = self.schedule
-        return [s.state, s.commodity, s.market, s.max_pages, s.interval]
+        return [s.state, s.commodity, s.market, s.max_pages, s.interval, "state-keyword-diagnostics-v2"]
 
     def status(self):
         with self.store.connection() as conn:
@@ -84,7 +85,8 @@ class FeedCollector:
             "next_attempt": timestamp(status.get("next_attempt")) if state not in ("disabled", "missing_key") else None,
             "inserted": status.get("inserted", 0), "repeated": status.get("repeated", 0),
             "page_limit_reached": status.get("page_limit_reached", False),
-            "message": status.get("message", ""), "failures": status.get("failures", 0)}
+            "message": status.get("message", ""), "failures": status.get("failures", 0),
+            "error_code": status.get("error_code"), "upstream_status": status.get("upstream_status")}
 
     def run_once(self, now=None):
         if not self.schedule.enabled or not os.getenv("DATA_GOV_API_KEY", "").strip():
@@ -105,15 +107,18 @@ class FeedCollector:
             try:
                 result = refresh_feed(self.store, self.schedule.state, self.schedule.commodity,
                                       self.schedule.market, self.schedule.max_pages)
-            except Exception:
+            except Exception as exc:
                 # Never log exception text/tracebacks: provider URLs can contain keys.
                 failures = status.get("failures", 0) + 1
                 delay = min(self.schedule.interval, 900 * 2 ** min(failures - 1, 6))
+                code = exc.code if isinstance(exc, FeedError) else "STORAGE" if isinstance(exc, sqlite3.Error) else "INTERNAL"
+                upstream = exc.upstream_status if isinstance(exc, FeedError) else None
                 status.update(state="error", failures=failures, next_attempt=now + delay,
-                    message="Automatic feed refresh failed. Check provider availability, API key and configured filters. Existing observations were retained.")
-                log.warning("Automatic feed refresh failed; retry scheduled in %s seconds.", delay)
+                    error_code=code, upstream_status=upstream, message=ERROR_MESSAGES[code])
+                log.warning("Automatic feed refresh failed [%s, HTTP=%s]; retry scheduled in %s seconds.", code, upstream, delay)
             else:
                 status.update(state="success", failures=0, last_success=now,
+                    error_code=None, upstream_status=None,
                     next_attempt=now + self.schedule.interval, inserted=result["inserted"],
                     repeated=result["repeated"], page_limit_reached=result.get("page_limit_reached", False),
                     message="Reported daily prices imported. This is not historical backfill or a continuous auction feed.")

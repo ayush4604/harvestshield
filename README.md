@@ -13,6 +13,7 @@ market revenue after transport and handling costs.
 - Price forecasts, decline-risk estimates and approximate uncertainty ranges.
 - Market comparisons for matching crop, variety, grade, unit and selling date.
 - CSV import and automatic production AGMARKNET daily updates through data.gov.in.
+- Searchable, type-or-select state and mandi filters using imported market names.
 - Chronological evaluation, baseline comparisons and historical replay.
 - Read-only deployment mode with protected backend administration.
 

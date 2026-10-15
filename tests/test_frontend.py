@@ -82,6 +82,51 @@ def test_backend_unavailable_is_actionable(monkeypatch):
     assert any("Backend connection unavailable" in e.value for e in ui.error)
 
 
+def test_searchable_state_mandi_filters_and_reset(ui):
+    state = ui.selectbox(key="browse_state_demo")
+    assert state.proto.accept_new_options
+    assert "Demo State" in state.options
+    state.set_value("Demo State").run()
+    market = ui.selectbox(key="browse_market_demo")
+    assert market.proto.accept_new_options
+    assert len(market.options) == 4
+    market.set_value("Demo Central Mandi").run()
+    assert not ui.exception
+    assert ui.metric[0].value == "1"
+    assert ui.metric[1].value == "550"
+    ui.radio[0].set_value("Forecasts").run()
+    assert not ui.exception
+    assert any(s.value == "Demo Central Mandi" for s in ui.subheader)
+    assert not any(s.value == "Demo Valley Mandi" for s in ui.subheader)
+    ui.selectbox(key="browse_state_demo").set_value(None).run()
+    assert ui.selectbox(key="browse_market_demo").value is None
+    ui.radio[0].set_value("Overview").run()
+    assert ui.metric[0].value == "4"
+
+
+def test_custom_typed_state_mandi_has_honest_empty_state(ui):
+    # AppTest's Selectbox.index cannot serialize a typed value outside options.
+    # Seed that accepted widget state before first rendering, then inspect result.
+    custom = AppTest.from_file(str(APP_FILE), default_timeout=30)
+    custom.session_state["browse_state_demo"] = "Custom State"
+    custom.session_state["browse_market_demo"] = "Custom Mandi"
+    custom.run()
+    assert not custom.exception
+    assert custom.selectbox(key="browse_state_demo").value == "Custom State"
+    assert custom.selectbox(key="browse_market_demo").value == "Custom Mandi"
+    assert custom.metric[0].value == "0"
+    assert any("No stored records match" in item.value for item in custom.info)
+
+
+def test_manual_connector_select_or_type_controls(ui):
+    ui.radio[0].set_value("Data & models").run()
+    ui.selectbox[0].set_value("Real · imported records").run()
+    assert not ui.exception
+    assert ui.selectbox(key="feed_state").proto.accept_new_options
+    assert ui.selectbox(key="feed_market").proto.accept_new_options
+    assert "Maharashtra" in ui.selectbox(key="feed_state").options
+
+
 @pytest.mark.parametrize("policy", [{"read_only": True}, {"admin_auth_required": True}])
 def test_shared_dashboard_never_exposes_admin_controls(ui, monkeypatch, policy):
     original = requests.request
