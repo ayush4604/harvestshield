@@ -81,6 +81,14 @@ Daily snapshots do not backfill historical data.
 
 ## Deployment
 
+The Dockerfile builds directly from a Git checkout. If no prepared seed is
+present, it generates a labeled synthetic demo during the image build. The
+default container runs both services and serves Streamlit on `PORT` (8501 by
+default), with FastAPI bound internally. Real observations are never fabricated.
+
+For a single hosted service, use the Dockerfile's default start command and
+`/_stcore/health` as the health path. Attach persistent storage at `/state`.
+
 After creating data and models, prepare the deployment seed:
 
 ```text

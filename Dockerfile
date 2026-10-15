@@ -9,9 +9,9 @@ RUN pip install --no-cache-dir -r requirements-lock.txt && pip check \
     && mkdir -p /state && chown 10001:10001 /state
 COPY --chown=10001:10001 backend ./backend
 COPY --chown=10001:10001 frontend ./frontend
-COPY --chown=10001:10001 deployment/bootstrap.py deployment/__init__.py ./deployment/
+COPY --chown=10001:10001 deployment ./deployment/
 COPY --chown=10001:10001 .streamlit ./.streamlit
-COPY --chown=10001:10001 deployment/seed /seed
+RUN python -m deployment.build_seed --output /seed && chown -R 10001:10001 /seed
 USER 10001:10001
 EXPOSE 8000 8501
-CMD ["python", "-m", "deployment.bootstrap", "api"]
+CMD ["python", "-m", "deployment.bootstrap", "web"]

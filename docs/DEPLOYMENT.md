@@ -1,5 +1,31 @@
 # Deployment
 
+## Single hosted service
+
+Build the root Dockerfile directly from Git. A prepared `deployment/seed` is
+optional: when absent, the image creates a clearly labeled synthetic demo.
+Real observations require a separately prepared seed or authorized import.
+
+Leave the start-command override empty, or use:
+
+```text
+python -m deployment.bootstrap web
+```
+
+The launcher starts FastAPI on internal loopback and Streamlit on the provider's
+`PORT`. Set the health-check path to `/_stcore/health`. Keep production read-only
+mode enabled. Attach persistent storage at `/state`, writable by UID/GID 10001.
+Without persistent storage, imports and model changes do not survive replacement.
+If the provider mounts volumes as root, configure supported volume permissions
+before startup rather than making the data directory publicly writable.
+
+For separate services, use `python -m deployment.bootstrap api` and
+`python -m deployment.bootstrap ui`, and configure the UI's
+`HARVESTSHIELD_API_URL` to the backend's private address. Set explicit backend
+allowed hosts for that private address. Both roles honor the host's `PORT`.
+
+## Docker Compose
+
 Run one FastAPI backend and one Streamlit frontend on a Docker host with Compose
 v2. The backend stays on the internal network. The frontend binds to host loopback
 on port 8501, ready for a TLS reverse proxy. Use at least 4 GB RAM.
