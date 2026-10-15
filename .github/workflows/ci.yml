@@ -1,0 +1,26 @@
+name: Software and container verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements-lock.txt
+      - run: pip check
+      - run: python -m pytest -q
+      - run: python -m backend.cli demo
+      - run: python scripts/prepare_release.py --allow-empty
+      - run: docker compose config --quiet
+      - run: docker compose up --build -d --wait --wait-timeout 180
+      - run: curl --fail http://127.0.0.1:8501/_stcore/health
+      - run: >-
+          docker compose exec -T backend python -c
+          "import json,urllib.request; r=json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/forecasts?mode=demo')); assert len(r['items']) == 4"
+      - if: always()
+        run: docker compose down

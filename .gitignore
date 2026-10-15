@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+deployment/seed/
+dist/
+*.zip
+*.log
+data/*.sqlite*
+data/imports/
+data/raw/
+artifacts/demo/
+artifacts/real/
+.streamlit/secrets.toml
+work/
+artifacts/backtests/
+submission/
+# Private local continuity notes, separate from public documentation.
+docs/CONTEXT.md
+docs/RESUME_TOMORROW.md
+docs/DEPLOYMENT_HANDOFF.md
