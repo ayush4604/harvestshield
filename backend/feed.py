@@ -50,10 +50,14 @@ def refresh_feed(store: Store, state: str, commodity: str, market: str = "", max
                   "filters[state.keyword]": state, "filters[commodity]": commodity}
         if market:
             params["filters[market]"] = market
+        headers = {
+            "User-Agent": os.getenv("HARVESTSHIELD_USER_AGENT", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
+            "Accept": "application/json, text/plain, */*",
+        }
         try:
             with requests.get(ENDPOINT, params=params,
-                              headers={"User-Agent": "HarvestShield/1.0", "Accept": "application/json"},
-                              timeout=(5, 15), stream=True, allow_redirects=False) as response:
+                              headers=headers,
+                              timeout=(15, 60), stream=True, allow_redirects=False) as response:
                 if response.status_code != 200:
                     code = f"HTTP_{response.status_code}"
                     raise FeedError(code if code in ERROR_MESSAGES else "HTTP_OTHER", upstream_status=response.status_code)

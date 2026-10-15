@@ -26,6 +26,26 @@ def initialize(seed: Path, state: Path):
     if database.exists():
         if not marker.exists() or json.loads(marker.read_text(encoding="utf-8")).get("format") != 1:
             raise ValueError("Persistent state is partially initialized. Restore a coherent backup before starting.")
+        import sqlite3
+        try:
+            with sqlite3.connect(f"{database.resolve().as_uri()}?mode=ro", uri=True) as conn:
+                real_count = conn.execute("SELECT COUNT(*) FROM observations WHERE mode='real'").fetchone()[0]
+        except Exception:
+            real_count = 0
+        seed_db = seed / "data" / "harvestshield.sqlite"
+        if real_count == 0 and seed_db.exists():
+            try:
+                with sqlite3.connect(f"{seed_db.resolve().as_uri()}?mode=ro", uri=True) as s_conn:
+                    seed_real_count = s_conn.execute("SELECT COUNT(*) FROM observations WHERE mode='real'").fetchone()[0]
+            except Exception:
+                seed_real_count = 0
+            if seed_real_count > 0:
+                for relative in files:
+                    destination = state / relative
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(seed / relative, destination)
+                marker.write_text(json.dumps({"format": 1, "initial_seed_files": len(files), "upgraded": True}), encoding="utf-8")
+                return True
         return False  # Never overwrite a deployment's database or models on restart.
     state.mkdir(parents=True, exist_ok=True)
     # Refuse ambiguous partially populated volumes instead of mixing generations.

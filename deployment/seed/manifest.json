@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "created_at": "2026-10-15T09:54:35.557250+00:00",
+  "files": {
+    "artifacts/backtests/real/summary.json": "ddbae7877460531652885c90f2a84d2d0981f855df32027604083169fb85e00f",
+    "artifacts/demo/evaluation.json": "5d1eff0beeb73bc9fc4bf4259d9f58a9da6ac37121d4a3d768556dfb37bb3a31",
+    "artifacts/demo/model.joblib": "795dfd9da029c70f88491ca47e82a3613dd4d2505168ade1cdd09a41cfaa4033",
+    "artifacts/real/evaluation.json": "70172e1da0269b3b0b5c98746b26eb2238874e9a93112285a1bb7287de36a575",
+    "artifacts/real/model.joblib": "4dc024220675835f2a576919859f60e8d2eb4997f54de59f6e107aa12019f171",
+    "data/harvestshield.sqlite": "c2db11690773134d5c0c73c4ddff5e719a21812972b6017ec701575f28c874ac",
+    "provenance/download_manifest.json": "397a0cc7f8713695213cf8eb12ba14977b3b715f0843cd548aa53b866e0310a9",
+    "provenance/publisher_metadata.json": "37f05159e08ff4c73fa0c1e9f00a14d33209c112aab7d9e6b76541d983d5a612"
+  },
+  "warning": "Checksums detect corruption, not malicious replacement. Load only trusted project-owned model artifacts."
+}

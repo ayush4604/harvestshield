@@ -4,7 +4,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
-deployment/seed/
+# deployment/seed/
 dist/
 *.zip
 *.log

@@ -1,0 +1,181 @@
+{
+  "mode": "demo",
+  "synthetic": true,
+  "model_version": 1,
+  "trained_at": "2026-10-14T20:09:19.877761+00:00",
+  "data_last_date": "2026-10-15",
+  "data_rows": 4380,
+  "horizon_days": 7,
+  "drop_threshold": 0.15,
+  "alert_probability_threshold": 0.3,
+  "calibration": "validation sigmoid",
+  "selected_regressor": "Ridge",
+  "selected_classifier": "Logistic Regression",
+  "validation_regressors": [
+    {
+      "model": "Persistence baseline",
+      "mae": 116.08289548022599,
+      "rmse": 150.44140800214103,
+      "wape": 0.05513622688375602
+    },
+    {
+      "model": "Ridge",
+      "mae": 95.30492794892558,
+      "rmse": 126.68091478992723,
+      "wape": 0.04526725585878495
+    },
+    {
+      "model": "Random Forest",
+      "mae": 110.56840597872443,
+      "rmse": 145.10944259454558,
+      "wape": 0.05251699393780772
+    },
+    {
+      "model": "Gradient Boosting",
+      "mae": 111.52175829893761,
+      "rmse": 143.70558794091207,
+      "wape": 0.052969810432520185
+    }
+  ],
+  "validation_classifiers": [
+    {
+      "model": "Constant-risk baseline",
+      "brier": 0.03539613742489729
+    },
+    {
+      "model": "Logistic Regression",
+      "brier": 0.034695293434680884
+    },
+    {
+      "model": "Random Forest",
+      "brier": 0.035349863862793575
+    },
+    {
+      "model": "Gradient Boosting",
+      "brier": 0.035409659086104224
+    }
+  ],
+  "splits": {
+    "train": {
+      "rows": 2780,
+      "start": "2023-10-24",
+      "end": "2025-09-17",
+      "latest_target": "2025-09-24",
+      "drop_events": 115
+    },
+    "validation": {
+      "rows": 708,
+      "start": "2025-09-25",
+      "end": "2026-03-20",
+      "latest_target": "2026-03-27",
+      "drop_events": 26
+    },
+    "test": {
+      "rows": 780,
+      "start": "2026-03-28",
+      "end": "2026-10-08",
+      "latest_target": "2026-10-15",
+      "drop_events": 52
+    }
+  },
+  "test_regression": {
+    "mae": 105.09148235754068,
+    "rmse": 136.96899922472844,
+    "wape": 0.06065371475797355
+  },
+  "test_persistence": {
+    "mae": 119.97923076923077,
+    "rmse": 156.70218669869877,
+    "wape": 0.06924620222978368
+  },
+  "test_mae_skill": 0.12408604652854727,
+  "test_risk": {
+    "precision": 0.16071428571428573,
+    "recall": 0.5192307692307693,
+    "f1": 0.24545454545454545,
+    "brier": 0.08248557121185102,
+    "average_precision": 0.1576377063495208,
+    "events": 52,
+    "rows": 780,
+    "base_rate": 0.06666666666666667,
+    "reliability_bins": [
+      {
+        "predicted_probability": 0.0738623170339005,
+        "observed_frequency": 0.03740157480314961,
+        "rows": 508
+      },
+      {
+        "predicted_probability": 0.2934308970118455,
+        "observed_frequency": 0.08648648648648649,
+        "rows": 185
+      },
+      {
+        "predicted_probability": 0.46699060165194034,
+        "observed_frequency": 0.19444444444444445,
+        "rows": 72
+      },
+      {
+        "predicted_probability": 0.6860394236808605,
+        "observed_frequency": 0.2,
+        "rows": 15
+      }
+    ]
+  },
+  "test_risk_baseline": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "brier": 0.06286230008798717,
+    "average_precision": 0.06666666666666667,
+    "events": 52,
+    "rows": 780,
+    "base_rate": 0.06666666666666667,
+    "reliability_bins": [
+      {
+        "predicted_probability": 0.04136690647482015,
+        "observed_frequency": 0.06666666666666667,
+        "rows": 780
+      }
+    ]
+  },
+  "test_interval_coverage": 0.7769230769230769,
+  "interval_note": "Approximate 80% interval from pooled validation residuals; no conditional coverage guarantee.",
+  "per_market": [
+    {
+      "series_id": "a2487441a9bdd5ad7e1a",
+      "market": "Demo Central Mandi",
+      "rows": 195,
+      "mae": 105.63830949860832,
+      "rmse": 135.8262710420652,
+      "wape": 0.054950123350803355
+    },
+    {
+      "series_id": "e3f200fee645df206984",
+      "market": "Demo Valley Mandi",
+      "rows": 195,
+      "mae": 92.78308538873661,
+      "rmse": 119.89642890147013,
+      "wape": 0.05985198571508933
+    },
+    {
+      "series_id": "ecde29a605551cbe4948",
+      "market": "Demo Hill Mandi",
+      "rows": 195,
+      "mae": 109.32653292661972,
+      "rmse": 144.0711875255041,
+      "wape": 0.06104519925293109
+    },
+    {
+      "series_id": "fce67e5c9dc7cd04fc3c",
+      "market": "Demo Riverside Mandi",
+      "rows": 195,
+      "mae": 112.61800161619807,
+      "rmse": 146.49774862081603,
+      "wape": 0.06755614440435899
+    }
+  ],
+  "warnings": [
+    "SYNTHETIC DEMO: all data and metrics are fictional demonstrations, not evidence of market forecasting quality.",
+    "Risk probabilities do not outperform the constant-frequency baseline on held-out test. Treat alerts as experimental, not validated decision support."
+  ]
+}

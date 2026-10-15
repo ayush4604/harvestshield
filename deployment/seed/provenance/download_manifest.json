@@ -1,0 +1,14 @@
+{
+  "publisher": "Vandeet Shah",
+  "source_page": "https://www.kaggle.com/datasets/vandeetshah/india-commodity-wise-mandi-dataset",
+  "license": "Apache 2.0",
+  "version": 1,
+  "publisher_updated": "2024-10-14T04:04:06.45Z",
+  "description": "This is a time series dataset, for 325 different commodities sold across all the mandis/APMC markets across India. Data is avaialble between the date range of **Jan 1st, 2000** to **Feb 1st, 2024**.\n\nEach file has the following columns:\n- State Name\n- District Name\n- Market Name\n- Variety\n- Group\n- Arrivals (Tonnes)\n- Min Price (Rs./Quintal)\n- Max Price (Rs./Quintal)\n- Modal Price (Rs./Quintal)\n- Reported Date",
+  "archive_sha256": "46e7e3f855ffc2b2ae350473a48d98f52e292a5669b7532bd245101d3c98b672",
+  "archive_file": "C:\\Users\\Asus\\OneDrive\\Desktop\\HarvestShield\\data\\raw\\public_release\\Tomato.zip",
+  "source_rows_read": 2338352,
+  "pune_rows": 22592,
+  "subset_file": "C:\\Users\\Asus\\OneDrive\\Desktop\\HarvestShield\\data\\imports\\public_tomato_pune_source.csv",
+  "provenance_limit": "Public publisher's historical market-data release; not independently verified against original daily government reports."
+}

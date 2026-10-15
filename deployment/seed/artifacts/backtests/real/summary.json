@@ -1,0 +1,268 @@
+{
+  "mode": "real",
+  "synthetic": false,
+  "runs": [
+    {
+      "cutoff": "2023-01-14",
+      "data_rows": 2318,
+      "splits": {
+        "train": {
+          "rows": 1329,
+          "start": "2021-01-15",
+          "end": "2022-04-12",
+          "latest_target": "2022-04-19",
+          "drop_events": 265
+        },
+        "validation": {
+          "rows": 289,
+          "start": "2022-04-20",
+          "end": "2022-08-12",
+          "latest_target": "2022-08-19",
+          "drop_events": 73
+        },
+        "test": {
+          "rows": 361,
+          "start": "2022-08-20",
+          "end": "2023-01-07",
+          "latest_target": "2023-01-14",
+          "drop_events": 98
+        }
+      },
+      "selected_regressor": "Persistence baseline",
+      "selected_classifier": "Constant-risk baseline",
+      "test_regression": {
+        "mae": 277.5623268698061,
+        "rmse": 545.9856014661103,
+        "wape": 0.23044548193463812
+      },
+      "test_persistence": {
+        "mae": 277.5623268698061,
+        "rmse": 545.9856014661103,
+        "wape": 0.23044548193463812
+      },
+      "test_mae_skill": 0.0,
+      "test_risk": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.20296729018547724,
+        "average_precision": 0.27146814404432135,
+        "events": 98,
+        "rows": 361,
+        "base_rate": 0.27146814404432135,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.19939804364183591,
+            "observed_frequency": 0.27146814404432135,
+            "rows": 361
+          }
+        ]
+      },
+      "test_risk_baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.20296729018547724,
+        "average_precision": 0.27146814404432135,
+        "events": 98,
+        "rows": 361,
+        "base_rate": 0.27146814404432135,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.19939804364183591,
+            "observed_frequency": 0.27146814404432135,
+            "rows": 361
+          }
+        ]
+      },
+      "warnings": [
+        "Too few validation events or insufficient variation for calibration. Risk estimates are uncalibrated.",
+        "Selected forecast does not outperform persistence on the held-out test. Do not claim decision improvement.",
+        "Risk probabilities do not outperform the constant-frequency baseline on held-out test. Treat alerts as experimental, not validated decision support."
+      ]
+    },
+    {
+      "cutoff": "2023-07-17",
+      "data_rows": 2935,
+      "splits": {
+        "train": {
+          "rows": 1661,
+          "start": "2021-01-15",
+          "end": "2022-08-18",
+          "latest_target": "2022-08-25",
+          "drop_events": 342
+        },
+        "validation": {
+          "rows": 410,
+          "start": "2022-08-26",
+          "end": "2023-02-01",
+          "latest_target": "2023-02-08",
+          "drop_events": 105
+        },
+        "test": {
+          "rows": 485,
+          "start": "2023-02-09",
+          "end": "2023-07-10",
+          "latest_target": "2023-07-17",
+          "drop_events": 57
+        }
+      },
+      "selected_regressor": "Persistence baseline",
+      "selected_classifier": "Random Forest",
+      "test_regression": {
+        "mae": 275.71546391752577,
+        "rmse": 561.872099031535,
+        "wape": 0.19019998293175547
+      },
+      "test_persistence": {
+        "mae": 275.71546391752577,
+        "rmse": 561.872099031535,
+        "wape": 0.19019998293175547
+      },
+      "test_mae_skill": 0.0,
+      "test_risk": {
+        "precision": 0.2033898305084746,
+        "recall": 0.631578947368421,
+        "f1": 0.3076923076923077,
+        "brier": 0.12191391368262902,
+        "average_precision": 0.2454988626732601,
+        "events": 57,
+        "rows": 485,
+        "base_rate": 0.11752577319587629,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.11742277905804918,
+            "observed_frequency": 0.03755868544600939,
+            "rows": 213
+          },
+          {
+            "predicted_probability": 0.2910715962199687,
+            "observed_frequency": 0.16568047337278108,
+            "rows": 169
+          },
+          {
+            "predicted_probability": 0.4676727848763027,
+            "observed_frequency": 0.17391304347826086,
+            "rows": 92
+          },
+          {
+            "predicted_probability": 0.623149788603206,
+            "observed_frequency": 0.45454545454545453,
+            "rows": 11
+          }
+        ]
+      },
+      "test_risk_baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.11152348043490494,
+        "average_precision": 0.11752577319587629,
+        "events": 57,
+        "rows": 485,
+        "base_rate": 0.11752577319587629,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.20590006020469606,
+            "observed_frequency": 0.11752577319587629,
+            "rows": 485
+          }
+        ]
+      },
+      "warnings": [
+        "Selected forecast does not outperform persistence on the held-out test. Do not claim decision improvement.",
+        "Risk probabilities do not outperform the constant-frequency baseline on held-out test. Treat alerts as experimental, not validated decision support."
+      ]
+    },
+    {
+      "cutoff": "2024-02-01",
+      "data_rows": 3560,
+      "splits": {
+        "train": {
+          "rows": 2029,
+          "start": "2021-01-15",
+          "end": "2023-01-08",
+          "latest_target": "2023-01-15",
+          "drop_events": 442
+        },
+        "validation": {
+          "rows": 541,
+          "start": "2023-01-18",
+          "end": "2023-07-03",
+          "latest_target": "2023-07-10",
+          "drop_events": 65
+        },
+        "test": {
+          "rows": 558,
+          "start": "2023-07-11",
+          "end": "2024-01-25",
+          "latest_target": "2024-02-01",
+          "drop_events": 158
+        }
+      },
+      "selected_regressor": "Persistence baseline",
+      "selected_classifier": "Random Forest",
+      "test_regression": {
+        "mae": 427.3297491039427,
+        "rmse": 796.5230220974048,
+        "wape": 0.2396000803858521
+      },
+      "test_persistence": {
+        "mae": 427.3297491039427,
+        "rmse": 796.5230220974048,
+        "wape": 0.2396000803858521
+      },
+      "test_mae_skill": 0.0,
+      "test_risk": {
+        "precision": 0.5384615384615384,
+        "recall": 0.13291139240506328,
+        "f1": 0.2131979695431472,
+        "brier": 0.20993543714599147,
+        "average_precision": 0.3871562049360543,
+        "events": 158,
+        "rows": 558,
+        "base_rate": 0.2831541218637993,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.11764877396662858,
+            "observed_frequency": 0.2532981530343008,
+            "rows": 379
+          },
+          {
+            "predicted_probability": 0.26244037034768275,
+            "observed_frequency": 0.3522727272727273,
+            "rows": 176
+          },
+          {
+            "predicted_probability": 0.4352146434367839,
+            "observed_frequency": 0.0,
+            "rows": 3
+          }
+        ]
+      },
+      "test_risk_baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.20724362968707993,
+        "average_precision": 0.2831541218637993,
+        "events": 158,
+        "rows": 558,
+        "base_rate": 0.2831541218637993,
+        "reliability_bins": [
+          {
+            "predicted_probability": 0.21784130113356334,
+            "observed_frequency": 0.2831541218637993,
+            "rows": 558
+          }
+        ]
+      },
+      "warnings": [
+        "Selected forecast does not outperform persistence on the held-out test. Do not claim decision improvement.",
+        "Risk probabilities do not outperform the constant-frequency baseline on held-out test. Treat alerts as experimental, not validated decision support."
+      ]
+    }
+  ],
+  "method": "Expanding data prefixes (65%, 82%, 100%), with independent chronological train/validation/test and seven-day embargo inside each prefix.",
+  "note": "Retrospective exploratory backtests; overlapping periods are not independent replicates. No test-based model tuning or farmer-income claim."
+}

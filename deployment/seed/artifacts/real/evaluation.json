@@ -1,0 +1,176 @@
+{
+  "mode": "real",
+  "synthetic": false,
+  "model_version": 1,
+  "trained_at": "2026-10-14T20:36:54.340618+00:00",
+  "data_last_date": "2024-02-01",
+  "data_rows": 3560,
+  "horizon_days": 7,
+  "drop_threshold": 0.15,
+  "alert_probability_threshold": 0.3,
+  "calibration": "validation sigmoid",
+  "selected_regressor": "Persistence baseline",
+  "selected_classifier": "Random Forest",
+  "validation_regressors": [
+    {
+      "model": "Persistence baseline",
+      "mae": 253.3678373382625,
+      "rmse": 531.071744477039,
+      "wape": 0.20090874446691878
+    },
+    {
+      "model": "Ridge",
+      "mae": 287.74744342909656,
+      "rmse": 591.8911442534153,
+      "wape": 0.22817015052200226
+    },
+    {
+      "model": "Random Forest",
+      "mae": 302.9282939449734,
+      "rmse": 684.9763089183632,
+      "wape": 0.24020784894941902
+    },
+    {
+      "model": "Gradient Boosting",
+      "mae": 323.82272833661,
+      "rmse": 726.9068365488129,
+      "wape": 0.2567761498990209
+    }
+  ],
+  "validation_classifiers": [
+    {
+      "model": "Constant-risk baseline",
+      "brier": 0.11525636825153567
+    },
+    {
+      "model": "Logistic Regression",
+      "brier": 0.1083963669804499
+    },
+    {
+      "model": "Random Forest",
+      "brier": 0.10480546482084839
+    },
+    {
+      "model": "Gradient Boosting",
+      "brier": 0.11472580159665685
+    }
+  ],
+  "splits": {
+    "train": {
+      "rows": 2029,
+      "start": "2021-01-15",
+      "end": "2023-01-08",
+      "latest_target": "2023-01-15",
+      "drop_events": 442
+    },
+    "validation": {
+      "rows": 541,
+      "start": "2023-01-18",
+      "end": "2023-07-03",
+      "latest_target": "2023-07-10",
+      "drop_events": 65
+    },
+    "test": {
+      "rows": 558,
+      "start": "2023-07-11",
+      "end": "2024-01-25",
+      "latest_target": "2024-02-01",
+      "drop_events": 158
+    }
+  },
+  "test_regression": {
+    "mae": 427.3297491039427,
+    "rmse": 796.5230220974048,
+    "wape": 0.2396000803858521
+  },
+  "test_persistence": {
+    "mae": 427.3297491039427,
+    "rmse": 796.5230220974048,
+    "wape": 0.2396000803858521
+  },
+  "test_mae_skill": 0.0,
+  "test_risk": {
+    "precision": 0.5384615384615384,
+    "recall": 0.13291139240506328,
+    "f1": 0.2131979695431472,
+    "brier": 0.20993543714599147,
+    "average_precision": 0.3871562049360543,
+    "events": 158,
+    "rows": 558,
+    "base_rate": 0.2831541218637993,
+    "reliability_bins": [
+      {
+        "predicted_probability": 0.1176487739666286,
+        "observed_frequency": 0.2532981530343008,
+        "rows": 379
+      },
+      {
+        "predicted_probability": 0.2624403703476827,
+        "observed_frequency": 0.3522727272727273,
+        "rows": 176
+      },
+      {
+        "predicted_probability": 0.43521464343678384,
+        "observed_frequency": 0.0,
+        "rows": 3
+      }
+    ]
+  },
+  "test_risk_baseline": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "brier": 0.20724362968707993,
+    "average_precision": 0.2831541218637993,
+    "events": 158,
+    "rows": 558,
+    "base_rate": 0.2831541218637993,
+    "reliability_bins": [
+      {
+        "predicted_probability": 0.21784130113356334,
+        "observed_frequency": 0.2831541218637993,
+        "rows": 558
+      }
+    ]
+  },
+  "test_interval_coverage": 0.6182795698924731,
+  "interval_note": "Approximate 80% interval from pooled validation residuals; no conditional coverage guarantee.",
+  "per_market": [
+    {
+      "series_id": "07d35c4386b471c2908d",
+      "market": "Pune(Khadiki)",
+      "rows": 132,
+      "mae": 214.3939393939394,
+      "rmse": 313.0979128488451,
+      "wape": 0.19134550371872888
+    },
+    {
+      "series_id": "239d6599742f005288e8",
+      "market": "Pune",
+      "rows": 149,
+      "mae": 412.08053691275165,
+      "rmse": 748.7797679822802,
+      "wape": 0.19369085173501577
+    },
+    {
+      "series_id": "729416078075cc9045eb",
+      "market": "Pune(Pimpri)",
+      "rows": 124,
+      "mae": 314.11290322580646,
+      "rmse": 431.59027015251695,
+      "wape": 0.19440978287996008
+    },
+    {
+      "series_id": "eb39bdb338aae202cbf9",
+      "market": "Pune(Moshi)",
+      "rows": 153,
+      "mae": 717.6470588235294,
+      "rmse": 1237.8692424638025,
+      "wape": 0.33277769358993786
+    }
+  ],
+  "warnings": [
+    "Selected forecast does not outperform persistence on the held-out test. Do not claim decision improvement.",
+    "Risk probabilities do not outperform the constant-frequency baseline on held-out test. Treat alerts as experimental, not validated decision support."
+  ]
+}
