@@ -70,7 +70,8 @@ with st.sidebar:
     st.markdown('<div class="brand">🌱 HarvestShield</div>', unsafe_allow_html=True)
     st.caption("Market insight. Clearer decisions.")
     st.divider()
-    dataset = st.selectbox("Dataset", ["Demo · synthetic", "Real · imported records"])
+    dataset = st.selectbox("Dataset", ["Demo · synthetic", "Real · imported records"],
+        index=1 if os.getenv("HARVESTSHIELD_ENV", "local") == "production" else 0)
     mode = "demo" if dataset.startswith("Demo") else "real"
     page = st.radio("Workspace", ["Overview", "Forecasts", "Market comparison", "Data & models"])
     st.divider()
@@ -96,6 +97,21 @@ if mode == "demo":
     st.warning("DEMONSTRATION ONLY — fictional markets and synthetic prices. Forecasts, model scores, and revenue estimates are not real-world evidence.")
 else:
     st.info("Imported market records · Wholesale estimates, not guaranteed transaction prices. Check variety, units, freshness, and model evaluation.")
+    feed_status = error_boundary(lambda: call("/api/feed/status"))
+    if feed_status:
+        state = feed_status["state"]
+        if state == "missing_key":
+            st.warning("Automatic prices: waiting for DATA_GOV_API_KEY in the deployment environment.")
+        elif state == "error":
+            st.warning(feed_status["message"] + " Next retry (UTC): " + str(feed_status["next_attempt"]))
+        elif state in ("waiting", "fetching"):
+            st.info("Automatic prices: first refresh is pending or in progress. Reload this page shortly.")
+        elif state == "success":
+            st.caption(f"Automatic prices · last successful check (UTC): {feed_status['last_success']} · next check: {feed_status['next_attempt']}")
+            if feed_status["page_limit_reached"]:
+                st.warning("Feed page limit reached: this snapshot may omit markets. Narrow the configured filters or review the page limit.")
+        else:
+            st.caption("Automatic price collection is disabled by the deployment administrator.")
 
 audit = error_boundary(lambda: call("/api/audit", params={"mode": mode}))
 if audit is None:
@@ -168,7 +184,10 @@ if page == "Overview":
     cols[2].metric("Forecast horizon", "7 calendar days")
     cols[3].metric("Drop-event definition", "15% decline")
     if not audit["rows"]:
-        st.info("No records in this dataset yet. Open Data & models to load the demo or import historical CSV records.")
+        if mode == "real" and not writes_enabled:
+            st.info("No real records yet. The backend collects configured daily prices automatically when its API key is set. Check the refresh status above; historical training data must be prepared by the administrator.")
+        else:
+            st.info("No records in this dataset yet. Open Data & models to load the demo or import historical CSV records.")
     else:
         st.subheader("Latest reported prices")
         data = pd.DataFrame(audit["series"])

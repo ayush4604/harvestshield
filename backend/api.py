@@ -14,6 +14,7 @@ from .data import CSV_COLUMNS, ProjectError, Store, demo_frame, parse_csv
 from .feed import refresh_feed
 from .models import ModelService
 from .security import guard_request
+from .scheduler import FeedCollector, FeedSchedule
 
 Mode = Literal["demo", "real"]
 
@@ -48,14 +49,26 @@ def create_app(settings=None):
     store = Store(settings)
     models = ModelService(store)
     feed_lock = threading.Lock()
+    collector = FeedCollector(store, FeedSchedule.from_environment(settings.environment), feed_lock)
+
+    @asynccontextmanager
+    async def lifespan(app):
+        collector.start()
+        try:
+            yield
+        finally:
+            collector.stop()
+
     app = FastAPI(title="HarvestShield API", version="1.1.0",
         description="Classical-ML crop price forecasts. Demo and real observations remain separate.",
+        lifespan=lifespan,
         docs_url=None if settings.environment == "production" else "/docs",
         redoc_url=None if settings.environment == "production" else "/redoc",
         openapi_url=None if settings.environment == "production" else "/openapi.json")
     app.state.store = store
     app.state.models = models
     app.state.settings = settings
+    app.state.collector = collector
 
     @app.middleware("http")
     async def security_guard(request, call_next):
@@ -87,6 +100,10 @@ def create_app(settings=None):
     @app.get("/api/audit")
     def audit(mode: Mode = "demo"):
         return store.audit(mode)
+
+    @app.get("/api/feed/status")
+    def feed_status():
+        return collector.status()
 
     @app.get("/api/history")
     def history(mode: Mode = "demo", series_id: str = Query(default="", max_length=40), limit: int = Query(default=2000, ge=1, le=10000)):

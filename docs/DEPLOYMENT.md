@@ -26,6 +26,51 @@ allowed hosts for that private address. Both roles honor the host's `PORT`.
 
 ## Docker Compose
 
+### Automatic daily prices
+
+The production backend enables its server-owned collector by default. Set a
+private `DATA_GOV_API_KEY` service variable. It fetches immediately on first
+startup, then every six hours; a saved next-attempt deadline prevents restart
+storms from repeatedly calling the provider. Public refresh/import/train routes
+remain blocked by `HARVESTSHIELD_READ_ONLY=true`.
+
+Optional service variables (official source spellings):
+
+```text
+HARVESTSHIELD_AUTO_REFRESH=true
+HARVESTSHIELD_FEED_STATE=Maharashtra
+HARVESTSHIELD_FEED_COMMODITY=Tomato
+HARVESTSHIELD_FEED_MARKET=
+HARVESTSHIELD_REFRESH_SECONDS=21600
+HARVESTSHIELD_FEED_MAX_PAGES=3
+```
+
+Only the backend needs these variables. Local development defaults to collection
+disabled unless explicitly enabled. Use one backend worker and one service replica
+with this SQLite deployment. Attach persistent storage at `/state`; otherwise data,
+collection status and retry deadlines are lost on container replacement. Ensure
+the volume is writable by UID/GID 10001. Configure the public domain target port
+to match the Streamlit `PORT` (8080 in the initial Railway deployment).
+
+Railway mounts volumes as root. Prefer arranging write access for UID 10001;
+if unavailable, Railway documents `RAILWAY_RUN_UID=0` as its workaround for
+non-root images. That runs the container as root, so use it only when needed for
+volume permissions, not as a general application requirement.
+See [Railway volume permissions](https://docs.railway.com/volumes#permissions).
+
+`GET /api/feed/status` and the Real dashboard show collection state, filters,
+last success, next attempt and truncation warnings. Failures retain existing data
+and retry after 15 minutes with exponential backoff up to the regular interval.
+The site remains available while the first fetch is running or the provider fails.
+Keys and provider exception URLs are not included in status or worker logs.
+
+This endpoint supplies daily reports, not historical backfill. Automatic collection
+does not train a model on a handful of new observations: sufficient exact-series
+history and honest time-based evaluation are still required. Existing trained
+models are preserved; no stale or unsupported forecasts are manufactured.
+
+### Compose launch
+
 Run one FastAPI backend and one Streamlit frontend on a Docker host with Compose
 v2. The backend stays on the internal network. The frontend binds to host loopback
 on port 8501, ready for a TLS reverse proxy. Use at least 4 GB RAM.

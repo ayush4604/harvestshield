@@ -12,7 +12,7 @@ market revenue after transport and handling costs.
 - Historical price charts, source attribution and data coverage checks.
 - Price forecasts, decline-risk estimates and approximate uncertainty ranges.
 - Market comparisons for matching crop, variety, grade, unit and selling date.
-- CSV import and optional AGMARKNET daily updates through data.gov.in.
+- CSV import and automatic production AGMARKNET daily updates through data.gov.in.
 - Chronological evaluation, baseline comparisons and historical replay.
 - Read-only deployment mode with protected backend administration.
 
@@ -77,7 +77,11 @@ See [data attribution](docs/THIRD_PARTY_DATA.md) for publisher and licensing det
 
 For daily government updates, configure `DATA_GOV_API_KEY` privately in the backend
 environment before starting it. Local launches do not automatically load `.env`.
-Daily snapshots do not backfill historical data.
+In production, the backend automatically collects Maharashtra tomato prices on
+first startup and every six hours, with persistent retry status and safe backoff.
+The Real dashboard shows collection status; public write controls stay disabled.
+State/crop/market filters and scheduling are configurable in the deployment guide.
+Daily snapshots do not backfill historical data or automatically train models.
 
 ## Deployment
 
