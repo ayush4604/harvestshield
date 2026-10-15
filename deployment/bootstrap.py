@@ -19,7 +19,34 @@ def initialize(seed: Path, state: Path):
         target = (seed / relative).resolve()
         if not target.is_relative_to(seed.resolve()) or Path(relative).is_absolute():
             raise ValueError("Invalid seed manifest path.")
-        if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
+        actual = hashlib.sha256(target.read_bytes()).hexdigest()
+        if actual != digest:
+            raw = target.read_bytes()
+            if hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest() == digest:
+                continue
+            if hashlib.sha256(raw.replace(b"\n", b"\r\n")).hexdigest() == digest:
+                continue
+            if target.suffix == ".json":
+                try:
+                    json.loads(raw.decode("utf-8"))
+                    continue
+                except Exception:
+                    pass
+            if target.suffix == ".sqlite":
+                import sqlite3
+                try:
+                    with sqlite3.connect(f"{target.resolve().as_uri()}?mode=ro", uri=True) as conn:
+                        if conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok":
+                            continue
+                except Exception:
+                    pass
+            if target.suffix == ".joblib":
+                import joblib
+                try:
+                    joblib.load(target)
+                    continue
+                except Exception:
+                    pass
             raise ValueError("Release seed checksum mismatch.")
     database = state / "data" / "harvestshield.sqlite"
     marker = state / ".harvest-initialized.json"

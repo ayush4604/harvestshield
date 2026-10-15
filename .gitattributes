@@ -5,3 +5,6 @@
 *.jpg binary
 *.pdf binary
 *.pptx binary
+*.sqlite binary
+*.joblib binary
+deployment/seed/** binary
